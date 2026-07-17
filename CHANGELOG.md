@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0 - 2026-07-17
+
+- Published the complete plugin source under `Source/` and changed the license
+  to AGPL-3.0-or-later.
+- Replaced the custom update manifest with GitHub Releases.
+- Generated a unique local Hue username for every installation and rejected
+  unknown usernames.
+- Restricted HAProxy ACLs by exact path shape and HTTP method.
+- Added reversible Easy HAProxy Setup for the web panel and SSH.
+- Removed network, SSDP, cancel timing, test-device, and SSDP reload controls
+  from the settings page.
+- Removed the standalone Teste Alexa development code.
+- Replaced the `Octo` command prefix with Portuguese, English, and Spanish
+  device names.
+- Added bidirectional printer power, printer light, and motor actions.
+- Added Enclosure output Label discovery and dropdown selection with controlled
+  behavior when OctoPrint-Enclosure is unavailable.
+- Matched the successful standalone Alexa state response and connection
+  behavior.
+
 ## 0.1.7 - 2026-07-16
 
 - Added the official OctoPrint Software Update check hook.

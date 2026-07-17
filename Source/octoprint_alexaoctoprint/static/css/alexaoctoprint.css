@@ -1,0 +1,57 @@
+.alexaoctoprint-settings h3 {
+  margin-top: 0;
+}
+
+.alexaoctoprint-inline-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.alexaoctoprint-debug {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 10px 0 16px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.alexaoctoprint-actions-toolbar {
+  margin: 12px 0;
+}
+
+.alexaoctoprint-proxy {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  margin: 14px 0;
+  padding: 10px 0;
+}
+
+.alexaoctoprint-proxy h4 {
+  margin-top: 0;
+}
+
+.alexaoctoprint-proxy pre {
+  margin-top: 8px;
+  max-height: 140px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.alexaoctoprint-actions td {
+  vertical-align: top;
+}
+
+.alexaoctoprint-actions label {
+  margin-bottom: 4px;
+}
+
+.alexaoctoprint-actions textarea {
+  font-family: monospace;
+  resize: vertical;
+}
+
+.alexaoctoprint-events {
+  margin-top: 16px;
+}

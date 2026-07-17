@@ -3,16 +3,16 @@ layout: plugin
 
 id: alexaoctoprint
 title: Alexa OctoPrint
-description: Control selected OctoPrint and 3D printer actions through Alexa over the local network without a cloud backend.
+description: Control selected OctoPrint and 3D printer actions through Alexa on the local network without an external backend.
 authors:
 - RICLAMER
-license: Proprietary
+license: AGPL-3.0-or-later
 
-date: 2026-07-16
+date: 2026-07-17
 
 homepage: https://github.com/RICLAMER/AlexaOctoPrint
 source: https://github.com/RICLAMER/AlexaOctoPrint
-archive: https://raw.githubusercontent.com/RICLAMER/AlexaOctoPrint/main/plugin/OctoPrint-AlexaOctoPrint.zip
+archive: https://github.com/RICLAMER/AlexaOctoPrint/archive/0.2.0.zip
 
 tags:
 - alexa
@@ -32,10 +32,24 @@ attributes:
 
 ---
 
-Alexa OctoPrint exposes enabled printer actions as local Philips Hue compatible devices. Discovery and control stay on the LAN; no external backend, Alexa skill, account, or cloud relay is required by the plugin.
+Alexa OctoPrint simulates local smart devices for enabled printer actions. No
+external integration account, Alexa skill, cloud backend, telemetry service, or
+relay is required.
 
-The plugin supports print control, homing and leveling, configurable Z and extrusion moves, bed and hotend temperatures, motor shutdown, guarded cancellation, configured print files, and optional OctoPrint-Enclosure outputs for printer power and lighting.
+Actions include pause, resume, guarded cancellation, homing, leveling, Z and
+extruder movement, configurable bed and nozzle temperatures, motors, selected
+files, emergency stop, and optional OctoPrint-Enclosure power and light outputs.
+Portuguese, English, and Spanish device names are included.
 
-**Additional setup is required on OctoPi.** Alexa local Hue discovery expects HTTP port 80 and root Hue paths. OctoPi's existing HAProxy remains the only listener on port 80 and must selectively forward `/description.xml`, `POST /api`, and Hue light paths to the plugin on OctoPrint's internal port 5000. The project README provides a tested configuration snippet and safety instructions. The plugin does not modify system services automatically.
+Local discovery requires restricted root routes on TCP port 80. Existing
+HAProxy or another reverse proxy can provide them. The repository includes an
+explicit Easy Setup that inspects the current listener, preserves unrelated
+routes, validates HAProxy before restart, and saves rollback state. The plugin
+does not silently modify system services.
 
-The Software Update hook reads the latest version from the public distribution repository and installs the matching package through OctoPrint's bundled Software Update plugin.
+Each installation generates its own local 40-character username. Proxy ACLs
+match only the description, username creation, and corresponding light paths;
+normal OctoPrint API routes are excluded.
+
+Updates use OctoPrint's `github_release` check and install the archive for the
+matching GitHub release tag.

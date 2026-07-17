@@ -1,0 +1,1 @@
+# The plugin uses OctoPrint and Python standard-library modules only.

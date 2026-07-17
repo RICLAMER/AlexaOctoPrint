@@ -1,25 +1,25 @@
-# Merge these rules into the existing OctoPi HAProxy configuration.
-# Do not replace the whole system file with this snippet.
-# Back up /etc/haproxy/haproxy.cfg and run `haproxy -c -f` before restarting.
+# Prefer Easy_setup_HAProxy instead of editing HAProxy manually.
+# This is a snippet, not a replacement for /etc/haproxy/haproxy.cfg.
+# Back up the complete file and validate it with `haproxy -c -f` first.
 
-# Add to the existing `frontend public` section, before `default_backend`:
+# Add inside the frontend or listen section bound to TCP port 80:
         acl alexaoctoprint_description path -i /description.xml
-        acl alexaoctoprint_api_create path -i /api
-        acl alexaoctoprint_api_user path -i /api/2WLEDHardQrI3WHYTHoMcXHgEspsM8ZZRpSKtBQr
-        acl alexaoctoprint_lights path_reg -i ^/api/[^/]+/lights(/.*)?$
-        use_backend alexaoctoprint_hue if alexaoctoprint_description
-        use_backend alexaoctoprint_hue if METH_POST alexaoctoprint_api_create
-        use_backend alexaoctoprint_hue if alexaoctoprint_api_user
-        use_backend alexaoctoprint_hue if alexaoctoprint_lights
+        acl alexaoctoprint_api_root path -i /api
+        acl alexaoctoprint_api_user path_reg -i ^/api/[0-9a-fA-F]{40}/?$
+        acl alexaoctoprint_lights path_reg -i ^/api/[0-9a-fA-F]{40}/lights(/[0-9]+(/state)?)?/?$
+        acl alexaoctoprint_get method GET
+        acl alexaoctoprint_post method POST
+        acl alexaoctoprint_state_write method PUT POST
+        use_backend alexaoctoprint_hue if alexaoctoprint_description alexaoctoprint_get
+        use_backend alexaoctoprint_hue if alexaoctoprint_api_root alexaoctoprint_post
+        use_backend alexaoctoprint_hue if alexaoctoprint_api_user alexaoctoprint_get
+        use_backend alexaoctoprint_hue if alexaoctoprint_lights alexaoctoprint_get
+        use_backend alexaoctoprint_hue if alexaoctoprint_lights alexaoctoprint_state_write
 
-# Add this backend at the end of the file:
+# Add at the end of the file. Change port 5000 only when OctoPrint uses another
+# internal port.
 backend alexaoctoprint_hue
-        acl needs_scheme req.hdr_cnt(X-Scheme) eq 0
-
         http-request set-header X-AlexaOctoPrint-Original-Path %[path]
         http-request set-path /plugin/alexaoctoprint%[path]
-        reqadd X-Scheme:\ https if needs_scheme { ssl_fc }
-        reqadd X-Scheme:\ http if needs_scheme !{ ssl_fc }
         option forwardfor
-        server octoprint1 127.0.0.1:5000
-        errorfile 503 /etc/haproxy/errors/503-no-octoprint.http
+        server alexaoctoprint 127.0.0.1:5000

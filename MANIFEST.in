@@ -1,0 +1,5 @@
+include README.md
+include LICENSE
+include requirements.txt
+recursive-include Source/octoprint_alexaoctoprint/templates *.jinja2
+recursive-include Source/octoprint_alexaoctoprint/static *.js *.css

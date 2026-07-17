@@ -1,165 +1,308 @@
-# AlexaOctoPrint
+# Alexa OctoPrint
 
-AlexaOctoPrint is an OctoPrint plugin that exposes selected printer actions to Alexa on the local network by emulating the parts of SSDP and the Philips Hue API used by local device discovery.
+Alexa OctoPrint is an OctoPrint plugin that simulates local smart devices for
+selected printer actions. It does not require an Alexa skill, an account on an
+external integration platform, or a cloud backend.
 
-No external cloud backend is required.
+Install the plugin, enable the actions you want, and ask:
+
+> Alexa, search for new devices.
+
+Discovery and control traffic stay on the local network.
 
 ## Status
 
-This project is an alpha implementation. Test every action from the OctoPrint settings page before allowing Alexa discovery.
+This project is an alpha release. Test every enabled action from the OctoPrint
+settings page before using it by voice.
 
 ## Requirements
 
-- OctoPrint running on Python 3.7 or newer
-- An Echo device on the same LAN as OctoPrint
-- A reverse proxy listening on TCP port 80 and forwarding the Hue routes to OctoPrint
+- OctoPrint 1.6.0 or newer
+- Python 3.7 or newer
+- A genuine Echo device on the same LAN as OctoPrint
+- TCP port 80 routing for the local smart-device endpoints
 - Optional: OctoPrint-Enclosure for printer power and light outputs
 
-## Installation
+## Install
 
 ### Plugin Manager
 
-Open `Settings > Plugin Manager`, select `Install from URL`, and use:
+Open `Settings > Plugin Manager`, select `Install from URL`, and use the release
+archive:
 
 ```text
-https://raw.githubusercontent.com/RICLAMER/AlexaOctoPrint/main/plugin/OctoPrint-AlexaOctoPrint.zip
+https://github.com/RICLAMER/AlexaOctoPrint/archive/0.2.0.zip
 ```
 
-You can also download [the latest package](plugin/OctoPrint-AlexaOctoPrint.zip) and upload it through the Plugin Manager.
+The latest tested upload package is also kept at
+[`plugin/OctoPrint-AlexaOctoPrint.zip`](plugin/OctoPrint-AlexaOctoPrint.zip).
+
+Restart OctoPrint after installation.
 
 ### Command Line
 
 ```bash
-~/oprint/bin/pip install https://raw.githubusercontent.com/RICLAMER/AlexaOctoPrint/main/plugin/OctoPrint-AlexaOctoPrint.zip
+~/oprint/bin/pip install \
+  https://github.com/RICLAMER/AlexaOctoPrint/archive/0.2.0.zip
 sudo service octoprint restart
 ```
 
-### Required HAProxy Routing on OctoPi
+## Port 80
 
-Alexa local Hue discovery expects TCP port 80 and root paths such as `/description.xml` and `/api/...`. OctoPi already uses HAProxy on port 80, so do not stop HAProxy and do not start another HTTP server on that port.
+Alexa local discovery expects the smart-device description and control routes
+at the root of TCP port 80. HAProxy is **not mandatory** when another existing
+reverse proxy already exposes the required routes correctly.
 
-1. Back up `/etc/haproxy/haproxy.cfg`.
-2. Merge the rules from [`plugin/haproxy.cfg.example`](plugin/haproxy.cfg.example) into the existing `frontend public` section and append the `alexaoctoprint_hue` backend.
-3. Validate the complete configuration before restarting:
+Common cases:
+
+- Existing HAProxy with Alexa OctoPrint routes: no additional proxy is needed.
+- Existing Nginx, Caddy, or another proxy with equivalent routes: keep it.
+- Port 80 free while OctoPrint uses an internal port: a port 80 proxy is still
+  required; the Easy Setup can install HAProxy.
+- OctoPrint directly using port 80: move OctoPrint to an internal port such as
+  5000 before placing a reverse proxy on port 80.
+- Another process using port 80: the Easy Setup reports it and makes no change.
+
+The managed rules accept only:
+
+- `GET /description.xml`
+- `POST /api`
+- `GET /api/<40-hex-character-installation-key>`
+- the matching `/lights` read and state routes
+
+Normal OctoPrint endpoints such as `/api/job` and `/api/files` never match these
+rules.
+
+### Easy Setup
+
+The helper is documented in
+[`Easy_setup_HAProxy/README.md`](Easy_setup_HAProxy/README.md). It can:
+
+- inspect the current port 80 listener;
+- preserve existing HAProxy routes;
+- replace legacy Alexa OctoPrint rules;
+- validate the full configuration before restart;
+- save rollback state under `/var/lib/alexaoctoprint-haproxy/`;
+- restore the exact saved configuration when it is safe to do so.
+
+For interactive SSH setup:
 
 ```bash
-sudo haproxy -c -f /etc/haproxy/haproxy.cfg
-sudo systemctl restart haproxy
-sudo systemctl restart octoprint
+git clone https://github.com/RICLAMER/AlexaOctoPrint.git
+cd AlexaOctoPrint
+sudo python3 Easy_setup_HAProxy/easy_setup_haproxy.py
 ```
 
-The example is a snippet, not a replacement for the complete system configuration. Other reverse proxies must implement equivalent selective routing while leaving normal OctoPrint traffic unchanged.
+The settings page also provides **Inspect**, **Install / update routes**, and
+**Restore previous configuration** controls. Systems that require a sudo
+password need the one-time, restricted web helper described in the Easy Setup
+guide.
 
-## Alexa Discovery
+## Configure and Discover
 
-1. Install and restart OctoPrint.
-2. Open OctoPrint settings, then `AlexaOctoPrint`.
-3. Confirm the advertised host, port, and path.
-4. Press `Refresh` and verify that the debug status shows SSDP running.
-5. Ask Alexa to discover devices.
+1. Open `Settings > Alexa OctoPrint`.
+2. Select Portuguese, English, or Spanish.
+3. Enable only the actions you intend to use.
+4. Configure temperatures, movement, G-code, files, and Enclosure Labels.
+5. Test actions with the **Run**, **On**, and **Off** buttons.
+6. Select **Refresh** and confirm that SSDP is running.
+7. Ask Alexa to search for new devices.
 
-The plugin advertises a Hue-compatible bridge and creates one virtual on/off light per enabled action. Actions are momentary commands, so the usual phrase is similar to:
+Changing the language or a device name requires Alexa discovery again.
 
-```text
-Alexa, turn on Octo Pause
-```
+When upgrading from 0.1.x, remove the old `Octo ...` devices from Alexa before
+discovery. Version 0.2.0 replaces the shared legacy username with a unique
+installation username and uses the new device names below.
 
-The exact phrasing depends on the Alexa language configured in your account/device.
+## Voice Commands
 
-After a successful momentary action, its Hue state remains on briefly so Echo can confirm the command, then resets automatically so the same action can be called again.
+The action names shown below are the English names used in the project and
+registration metadata. The voice examples follow the selected plugin language.
+Custom device names remain available in settings.
 
-## Command Languages
+### Portuguese
 
-The settings page supports Portuguese, English, and Spanish default device names. Each action also has a custom name field, so you can tune names for your Alexa account.
+| Action | Voice command |
+| --- | --- |
+| 3D Printer | "Alexa, ligar impressora 3D" / "Alexa, desligar impressora 3D" |
+| Printer Light | "Alexa, ligar luz da impressora" / "Alexa, desligar luz da impressora" |
+| Pause Print | "Alexa, pausar impressão" |
+| Resume Print | "Alexa, retomar impressão" |
+| Cancel Print | "Alexa, cancelar impressão" |
+| Home Printer | "Alexa, levar impressora para Home" |
+| Level Bed | "Alexa, nivelar mesa" |
+| Raise Z Axis | "Alexa, subir eixo Z" |
+| Lower Z Axis | "Alexa, baixar eixo Z" |
+| Extrude Filament | "Alexa, extrudar filamento" |
+| Retract Filament | "Alexa, recolher filamento" |
+| Heat Bed | "Alexa, aquecer mesa" / "Alexa, ligar aquecimento da mesa" |
+| Turn Off Bed | "Alexa, desligar mesa" / "Alexa, desligar aquecimento da mesa" |
+| Heat Nozzle for PLA | "Alexa, aquecer bico para PLA" |
+| Heat Nozzle for ABS | "Alexa, aquecer bico para ABS" |
+| Heat Nozzle for PETG | "Alexa, aquecer bico para PETG" |
+| Turn Off Nozzle Heating | "Alexa, desligar aquecimento do bico" / "Alexa, desligar bico" |
+| Printer Motors | "Alexa, ligar motores da impressora" / "Alexa, desligar motores da impressora" |
+| Print Last File | "Alexa, imprimir último arquivo" |
+| Print Part One | "Alexa, imprimir peça um" |
+| Print Part Two | "Alexa, imprimir peça dois" |
+| Print Part Three | "Alexa, imprimir peça três" |
+| Printer Emergency | "Alexa, emergência da impressora" / "Alexa, parar impressora imediatamente" |
 
-Default Portuguese commands include:
+### English
 
-- Octo Pausar
-- Octo Retomar
-- Octo Home
-- Octo Nivelamento
-- Octo Subir Eixo Z
-- Octo Descer Eixo Z
-- Octo Cancelar
-- Octo Ligar Impressora
-- Octo Ligar Luz Impressora
-- Octo Desligar Impressora
-- Octo Imprimir Ultimo Arquivo
-- Octo Retract
-- Octo Extrude
-- Octo Aquecer Mesa
-- Octo Desligar Mesa
-- Octo Aquecer HotEnd PLA
-- Octo Aquecer HotEnd ABS
-- Octo Aquecer HotEnd PETG
-- Octo Desligar HotEnd
-- Octo Desligar Motores
-- Octo Emergencia
-- Octo Imprimir Peca 1
-- Octo Imprimir Peca 2
-- Octo Imprimir Peca 3
+| Action | Voice command |
+| --- | --- |
+| 3D Printer | "Alexa, turn on 3D printer" / "Alexa, turn off 3D printer" |
+| Printer Light | "Alexa, turn on printer light" / "Alexa, turn off printer light" |
+| Pause Print | "Alexa, pause print" |
+| Resume Print | "Alexa, resume print" |
+| Cancel Print | "Alexa, cancel print" |
+| Home Printer | "Alexa, home printer" |
+| Level Bed | "Alexa, level bed" |
+| Raise Z Axis | "Alexa, raise Z axis" |
+| Lower Z Axis | "Alexa, lower Z axis" |
+| Extrude Filament | "Alexa, extrude filament" |
+| Retract Filament | "Alexa, retract filament" |
+| Heat Bed | "Alexa, heat bed" / "Alexa, turn on bed heating" |
+| Turn Off Bed | "Alexa, turn off bed" / "Alexa, turn off bed heating" |
+| Heat Nozzle for PLA | "Alexa, heat nozzle for PLA" |
+| Heat Nozzle for ABS | "Alexa, heat nozzle for ABS" |
+| Heat Nozzle for PETG | "Alexa, heat nozzle for PETG" |
+| Turn Off Nozzle Heating | "Alexa, turn off nozzle heating" / "Alexa, turn off nozzle" |
+| Printer Motors | "Alexa, turn on printer motors" / "Alexa, turn off printer motors" |
+| Print Last File | "Alexa, print last file" |
+| Print Part One | "Alexa, print part one" |
+| Print Part Two | "Alexa, print part two" |
+| Print Part Three | "Alexa, print part three" |
+| Printer Emergency | "Alexa, printer emergency" / "Alexa, stop printer immediately" |
 
-## Safety Defaults
+### Spanish
 
-- `Print last file`, `Emergency`, and the three print slots are disabled by default.
-- Cancel can require two calls within a configurable timeout.
-- Motion and extrusion actions are blocked while printing unless explicitly allowed.
-- Power off through Enclosure is blocked while printing unless explicitly allowed.
-- Temperatures, extrusion length, Z movement distance, feedrate, and G-code are editable in settings.
+| Action | Voice command |
+| --- | --- |
+| 3D Printer | "Alexa, enciende impresora 3D" / "Alexa, apaga impresora 3D" |
+| Printer Light | "Alexa, enciende luz de la impresora" / "Alexa, apaga luz de la impresora" |
+| Pause Print | "Alexa, pausa impresión" |
+| Resume Print | "Alexa, reanuda impresión" |
+| Cancel Print | "Alexa, cancela impresión" |
+| Home Printer | "Alexa, lleva impresora a inicio" |
+| Level Bed | "Alexa, nivela cama" |
+| Raise Z Axis | "Alexa, sube eje Z" |
+| Lower Z Axis | "Alexa, baja eje Z" |
+| Extrude Filament | "Alexa, extruye filamento" |
+| Retract Filament | "Alexa, retrae filamento" |
+| Heat Bed | "Alexa, calienta cama" / "Alexa, enciende calentamiento de cama" |
+| Turn Off Bed | "Alexa, apaga cama" / "Alexa, apaga calentamiento de cama" |
+| Heat Nozzle for PLA | "Alexa, calienta boquilla para PLA" |
+| Heat Nozzle for ABS | "Alexa, calienta boquilla para ABS" |
+| Heat Nozzle for PETG | "Alexa, calienta boquilla para PETG" |
+| Turn Off Nozzle Heating | "Alexa, apaga calentamiento de la boquilla" / "Alexa, apaga boquilla" |
+| Printer Motors | "Alexa, enciende motores de la impresora" / "Alexa, apaga motores de la impresora" |
+| Print Last File | "Alexa, imprime último archivo" |
+| Print Part One | "Alexa, imprime pieza uno" |
+| Print Part Two | "Alexa, imprime pieza dos" |
+| Print Part Three | "Alexa, imprime pieza tres" |
+| Printer Emergency | "Alexa, emergencia de la impresora" / "Alexa, detén impresora inmediatamente" |
+
+Alexa language behavior can vary by Echo model and account locale. A custom
+device name can be used when a default phrase is not recognized reliably.
+
+## Configurable Parameters
+
+- Bed temperature: 100 C by default
+- PLA nozzle temperature: 200 C
+- ABS nozzle temperature: 240 C
+- PETG nozzle temperature: 235 C
+- Z movement: 2 mm at 600 mm/min
+- Extrusion: 5 mm at 300 mm/min
+- Retraction: 5 mm at 1800 mm/min
+- Homing, leveling, motor, shutdown, and emergency G-code
+- Three selectable OctoPrint file slots
+- Enclosure output Labels for printer power and light
 
 ## Enclosure Plugin
 
-The Enclosure integration controls outputs by label. Defaults:
+Printer power and light actions are optional. When OctoPrint-Enclosure is
+loaded, Alexa OctoPrint reads its current output Labels and presents them in
+dropdowns. Label matching ignores capitalization and extra whitespace.
 
-- Printer power: `Power`
-- Printer light: `LIGHT`
+If OctoPrint-Enclosure is missing, disabled, or does not contain the selected
+Label:
 
-Label matching ignores capitalization and extra whitespace. AlexaOctoPrint resolves the Enclosure plugin implementation, writes the configured GPIO with `active_low` support, and reads the physical output state back before reporting success. Change the labels in AlexaOctoPrint settings if your Enclosure outputs use different names.
+- Alexa OctoPrint continues running;
+- unrelated actions remain available;
+- the settings page shows the detected condition;
+- power or light commands return a controlled error in Debug.
 
-## Debugging
+## Safety
 
-The settings page exposes:
+- Print Last File, the three file slots, and Printer Emergency are disabled by
+  default.
+- Cancel Print always requires the command twice within 15 seconds.
+- Motion, extrusion, motor, printing, and power actions are blocked while the
+  printer is printing or paused unless explicitly allowed.
+- Printer power off is blocked while printing by default.
+- Momentary actions reset their reported smart-device state automatically.
+- Emergency uses `M112`, `M104 S0`, and `M140 S0` by default.
 
-- SSDP running state
-- Discovery request counters
-- Last Echo address that sent `M-SEARCH`
-- Advertised `description.xml` URL
-- Enabled Hue device IDs
-- Recent action events and errors
-- Manual `Run` button for every action
+## Debug
 
-The plugin also exposes local diagnostic endpoints:
+The settings page includes:
+
+- SSDP state, discovery counter, and last Echo address;
+- description URL and Hue HTTP request counters;
+- enabled device IDs and current states;
+- Enclosure availability and discovered Labels;
+- recent actions and controlled errors;
+- manual action execution;
+- port 80 routing inspection.
+
+Local diagnostic endpoints:
 
 - `/plugin/alexaoctoprint/description.xml`
 - `/plugin/alexaoctoprint/espalexa`
 - `/plugin/alexaoctoprint/debug/status`
 
-## Network Notes
-
-Alexa Echo generations that use local Hue discovery expect the emulated bridge on TCP port 80. Keep the advertised port set to `80`.
-
-OctoPi normally uses HAProxy on port 80 and runs OctoPrint internally on port 5000. These services can coexist: HAProxy keeps ownership of port 80, forwards `/description.xml`, `POST /api`, and the AlexaOctoPrint Hue username paths to `/plugin/alexaoctoprint` on port 5000, and sends all other traffic to the normal OctoPrint backend. Do not start a second HTTP listener on port 80.
-
-The public [`plugin/haproxy.cfg.example`](plugin/haproxy.cfg.example) contains the required selective routes. Back up and validate the system HAProxy configuration before applying those routes.
-
-Some Alexa/Hue discovery behavior is strict about local network multicast. If devices are not found, check:
-
-- Echo and Raspberry Pi are on the same subnet
-- Client isolation is disabled on Wi-Fi
-- UDP multicast to `239.255.255.250:1900` is not blocked
-- The advertised URL opens from another device on the LAN
+The per-installation smart-device username is never displayed or written to
+Debug logs; only a short suffix is shown for diagnostics.
 
 ## Updates
 
-Alexa OctoPrint registers the official `octoprint.plugin.softwareupdate.check_config` hook. OctoPrint reads the latest version from [`plugin/version.json`](plugin/version.json) and installs the current public ZIP through its Software Update plugin.
+Alexa OctoPrint uses OctoPrint's
+`octoprint.plugin.softwareupdate.check_config` hook with the
+`github_release` check type. Releases are tagged with the plugin version, and
+OctoPrint installs the matching GitHub tag archive:
 
-The version check may be cached by OctoPrint. Use `Settings > Software Update > Advanced options > Force check for update` when validating a newly published version.
+```text
+https://github.com/RICLAMER/AlexaOctoPrint/archive/{target_version}.zip
+```
 
-## Privacy
+This follows the release and update pattern used by
+[OctoPrint-BLTouch](https://github.com/jneilliii/OctoPrint-BLTouch).
 
-The plugin does not require an Alexa skill, external account, cloud backend, telemetry service, or analytics endpoint. Discovery and control traffic stay on the local network. OctoPrint still needs internet access when checking for or downloading updates from GitHub.
+## Privacy and Security
+
+- No external integration account, skill, telemetry, or cloud relay is used.
+- A random 40-character local username is generated for each installation.
+- Requests with another username receive a local unauthorized response.
+- Reverse-proxy rules validate both HTTP method and exact path shape.
+- Normal OctoPrint API traffic is not routed to the plugin.
+
+The local username is an emulated device credential, not an Amazon, Philips, or
+OctoPrint account key.
+
+## Acknowledgements
+
+Local discovery behavior was informed by
+[Aircoookie/Espalexa](https://github.com/Aircoookie/Espalexa), an MIT-licensed
+Arduino library for local Alexa device control. Alexa, Echo, Philips, and Hue
+are trademarks of their respective owners. This project is not affiliated with
+or endorsed by Amazon or Signify.
 
 ## License
 
-Copyright 2026 RICLAMER. Distributed under the proprietary terms in [LICENSE](LICENSE).
+Copyright 2026 RICLAMER.
 
+Alexa OctoPrint is free software licensed under the
+[GNU Affero General Public License v3.0 or later](LICENSE)
+(`AGPL-3.0-or-later`).

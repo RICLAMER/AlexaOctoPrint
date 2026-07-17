@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61,<68", "wheel<0.43"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "OctoPrint-AlexaOctoPrint"
+version = "0.2.0"
+description = "Local Alexa control for selected OctoPrint and 3D printer actions."
+readme = "README.md"
+requires-python = ">=3.7,<4"
+license = { text = "AGPL-3.0-or-later" }
+authors = [
+  { name = "RICLAMER" }
+]
+keywords = ["OctoPrint", "Alexa", "Philips Hue", "SSDP", "3D printing"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: OctoPrint",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Home Automation",
+  "Topic :: Printing"
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/RICLAMER/AlexaOctoPrint"
+Documentation = "https://github.com/RICLAMER/AlexaOctoPrint"
+Source = "https://github.com/RICLAMER/AlexaOctoPrint"
+Issues = "https://github.com/RICLAMER/AlexaOctoPrint/issues"
+
+[project.entry-points."octoprint.plugin"]
+alexaoctoprint = "octoprint_alexaoctoprint"
+
+[tool.setuptools.packages.find]
+where = ["Source"]
+include = ["octoprint_alexaoctoprint*"]
+
+[tool.setuptools.package-data]
+octoprint_alexaoctoprint = [
+  "templates/*.jinja2",
+  "static/js/*.js",
+  "static/css/*.css"
+]
