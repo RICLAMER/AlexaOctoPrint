@@ -1,0 +1,25 @@
+# Merge these rules into the existing OctoPi HAProxy configuration.
+# Do not replace the whole system file with this snippet.
+# Back up /etc/haproxy/haproxy.cfg and run `haproxy -c -f` before restarting.
+
+# Add to the existing `frontend public` section, before `default_backend`:
+        acl alexaoctoprint_description path -i /description.xml
+        acl alexaoctoprint_api_create path -i /api
+        acl alexaoctoprint_api_user path -i /api/2WLEDHardQrI3WHYTHoMcXHgEspsM8ZZRpSKtBQr
+        acl alexaoctoprint_lights path_reg -i ^/api/[^/]+/lights(/.*)?$
+        use_backend alexaoctoprint_hue if alexaoctoprint_description
+        use_backend alexaoctoprint_hue if METH_POST alexaoctoprint_api_create
+        use_backend alexaoctoprint_hue if alexaoctoprint_api_user
+        use_backend alexaoctoprint_hue if alexaoctoprint_lights
+
+# Add this backend at the end of the file:
+backend alexaoctoprint_hue
+        acl needs_scheme req.hdr_cnt(X-Scheme) eq 0
+
+        http-request set-header X-AlexaOctoPrint-Original-Path %[path]
+        http-request set-path /plugin/alexaoctoprint%[path]
+        reqadd X-Scheme:\ https if needs_scheme { ssl_fc }
+        reqadd X-Scheme:\ http if needs_scheme !{ ssl_fc }
+        option forwardfor
+        server octoprint1 127.0.0.1:5000
+        errorfile 503 /etc/haproxy/errors/503-no-octoprint.http
