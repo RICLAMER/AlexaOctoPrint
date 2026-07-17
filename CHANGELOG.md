@@ -2,6 +2,11 @@
 
 ## 0.2.0 - 2026-07-17
 
+- Made the settings action list react immediately to Portuguese, English, and
+  Spanish language selection while preserving explicit custom names.
+- Translated the documented action-name columns for all three languages.
+- Changed the gallery installation URL to the permanent latest stable Release
+  asset.
 - Published the complete plugin source under `Source/` and changed the license
   to AGPL-3.0-or-later.
 - Replaced the custom update manifest with GitHub Releases.

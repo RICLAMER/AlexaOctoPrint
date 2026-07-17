@@ -15,6 +15,13 @@ $(function () {
             return self.settings.settings.plugins.alexaoctoprint;
         };
 
+        self.selectedLanguage = ko.pureComputed(function () {
+            var pluginSettings = self.pluginSettings();
+            return String(
+                (pluginSettings && ko.unwrap(pluginSettings.language)) || "pt"
+            ).toLowerCase();
+        });
+
         self.actionSetting = function (action, key) {
             var pluginSettings = self.pluginSettings();
             if (!pluginSettings || !pluginSettings.actions || !pluginSettings.actions[action.key]) {
@@ -33,6 +40,23 @@ $(function () {
                 pluginSettings.actions &&
                 pluginSettings.actions[action.key] &&
                 pluginSettings.actions[action.key][key] !== undefined
+            );
+        };
+
+        self.actionDisplayName = function (action) {
+            var customName = String(
+                ko.unwrap(self.actionSetting(action, "name")) || ""
+            ).trim();
+            if (customName) {
+                return customName;
+            }
+
+            var names = action.names || {};
+            return (
+                names[self.selectedLanguage()] ||
+                names.pt ||
+                action.name ||
+                action.key
             );
         };
 

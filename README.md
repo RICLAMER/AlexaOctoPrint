@@ -31,7 +31,7 @@ Open `Settings > Plugin Manager`, select `Install from URL`, and use the release
 archive:
 
 ```text
-https://github.com/RICLAMER/AlexaOctoPrint/archive/0.2.0.zip
+https://github.com/RICLAMER/AlexaOctoPrint/releases/latest/download/OctoPrint-AlexaOctoPrint.zip
 ```
 
 The latest tested upload package is also kept at
@@ -43,7 +43,7 @@ Restart OctoPrint after installation.
 
 ```bash
 ~/oprint/bin/pip install \
-  https://github.com/RICLAMER/AlexaOctoPrint/archive/0.2.0.zip
+  https://github.com/RICLAMER/AlexaOctoPrint/releases/latest/download/OctoPrint-AlexaOctoPrint.zip
 sudo service octoprint restart
 ```
 
@@ -108,7 +108,10 @@ guide.
 6. Select **Refresh** and confirm that SSDP is running.
 7. Ask Alexa to search for new devices.
 
-Changing the language or a device name requires Alexa discovery again.
+The action list changes immediately when a different language is selected.
+Save the settings before Alexa discovery. Alexa may retain names from devices
+that were already discovered, so remove those devices before discovering them
+again in another language.
 
 When upgrading from 0.1.x, remove the old `Octo ...` devices from Alexa before
 discovery. Version 0.2.0 replaces the shared legacy username with a unique
@@ -116,37 +119,37 @@ installation username and uses the new device names below.
 
 ## Voice Commands
 
-The action names shown below are the English names used in the project and
-registration metadata. The voice examples follow the selected plugin language.
-Custom device names remain available in settings.
+Each table shows the default action names and voice examples for the selected
+plugin language. Custom device names remain available in settings and are not
+translated automatically.
 
 ### Portuguese
 
 | Action | Voice command |
 | --- | --- |
-| 3D Printer | "Alexa, ligar impressora 3D" / "Alexa, desligar impressora 3D" |
-| Printer Light | "Alexa, ligar luz da impressora" / "Alexa, desligar luz da impressora" |
-| Pause Print | "Alexa, pausar impressão" |
-| Resume Print | "Alexa, retomar impressão" |
-| Cancel Print | "Alexa, cancelar impressão" |
-| Home Printer | "Alexa, levar impressora para Home" |
-| Level Bed | "Alexa, nivelar mesa" |
-| Raise Z Axis | "Alexa, subir eixo Z" |
-| Lower Z Axis | "Alexa, baixar eixo Z" |
-| Extrude Filament | "Alexa, extrudar filamento" |
-| Retract Filament | "Alexa, recolher filamento" |
-| Heat Bed | "Alexa, aquecer mesa" / "Alexa, ligar aquecimento da mesa" |
-| Turn Off Bed | "Alexa, desligar mesa" / "Alexa, desligar aquecimento da mesa" |
-| Heat Nozzle for PLA | "Alexa, aquecer bico para PLA" |
-| Heat Nozzle for ABS | "Alexa, aquecer bico para ABS" |
-| Heat Nozzle for PETG | "Alexa, aquecer bico para PETG" |
-| Turn Off Nozzle Heating | "Alexa, desligar aquecimento do bico" / "Alexa, desligar bico" |
-| Printer Motors | "Alexa, ligar motores da impressora" / "Alexa, desligar motores da impressora" |
-| Print Last File | "Alexa, imprimir último arquivo" |
-| Print Part One | "Alexa, imprimir peça um" |
-| Print Part Two | "Alexa, imprimir peça dois" |
-| Print Part Three | "Alexa, imprimir peça três" |
-| Printer Emergency | "Alexa, emergência da impressora" / "Alexa, parar impressora imediatamente" |
+| Impressora 3D | "Alexa, ligar impressora 3D" / "Alexa, desligar impressora 3D" |
+| Luz da Impressora | "Alexa, ligar luz da impressora" / "Alexa, desligar luz da impressora" |
+| Pausar Impressão | "Alexa, pausar impressão" |
+| Retomar Impressão | "Alexa, retomar impressão" |
+| Cancelar Impressão | "Alexa, cancelar impressão" |
+| Levar Impressora para Home | "Alexa, levar impressora para Home" |
+| Nivelar Mesa | "Alexa, nivelar mesa" |
+| Subir Eixo Z | "Alexa, subir eixo Z" |
+| Baixar Eixo Z | "Alexa, baixar eixo Z" |
+| Extrudar Filamento | "Alexa, extrudar filamento" |
+| Recolher Filamento | "Alexa, recolher filamento" |
+| Aquecer Mesa | "Alexa, aquecer mesa" / "Alexa, ligar aquecimento da mesa" |
+| Desligar Mesa | "Alexa, desligar mesa" / "Alexa, desligar aquecimento da mesa" |
+| Aquecer Bico para PLA | "Alexa, aquecer bico para PLA" |
+| Aquecer Bico para ABS | "Alexa, aquecer bico para ABS" |
+| Aquecer Bico para PETG | "Alexa, aquecer bico para PETG" |
+| Desligar Aquecimento do Bico | "Alexa, desligar aquecimento do bico" / "Alexa, desligar bico" |
+| Motores da Impressora | "Alexa, ligar motores da impressora" / "Alexa, desligar motores da impressora" |
+| Imprimir Último Arquivo | "Alexa, imprimir último arquivo" |
+| Imprimir Peça Um | "Alexa, imprimir peça um" |
+| Imprimir Peça Dois | "Alexa, imprimir peça dois" |
+| Imprimir Peça Três | "Alexa, imprimir peça três" |
+| Emergência da Impressora | "Alexa, emergência da impressora" / "Alexa, parar impressora imediatamente" |
 
 ### English
 
@@ -180,29 +183,29 @@ Custom device names remain available in settings.
 
 | Action | Voice command |
 | --- | --- |
-| 3D Printer | "Alexa, enciende impresora 3D" / "Alexa, apaga impresora 3D" |
-| Printer Light | "Alexa, enciende luz de la impresora" / "Alexa, apaga luz de la impresora" |
-| Pause Print | "Alexa, pausa impresión" |
-| Resume Print | "Alexa, reanuda impresión" |
-| Cancel Print | "Alexa, cancela impresión" |
-| Home Printer | "Alexa, lleva impresora a inicio" |
-| Level Bed | "Alexa, nivela cama" |
-| Raise Z Axis | "Alexa, sube eje Z" |
-| Lower Z Axis | "Alexa, baja eje Z" |
-| Extrude Filament | "Alexa, extruye filamento" |
-| Retract Filament | "Alexa, retrae filamento" |
-| Heat Bed | "Alexa, calienta cama" / "Alexa, enciende calentamiento de cama" |
-| Turn Off Bed | "Alexa, apaga cama" / "Alexa, apaga calentamiento de cama" |
-| Heat Nozzle for PLA | "Alexa, calienta boquilla para PLA" |
-| Heat Nozzle for ABS | "Alexa, calienta boquilla para ABS" |
-| Heat Nozzle for PETG | "Alexa, calienta boquilla para PETG" |
-| Turn Off Nozzle Heating | "Alexa, apaga calentamiento de la boquilla" / "Alexa, apaga boquilla" |
-| Printer Motors | "Alexa, enciende motores de la impresora" / "Alexa, apaga motores de la impresora" |
-| Print Last File | "Alexa, imprime último archivo" |
-| Print Part One | "Alexa, imprime pieza uno" |
-| Print Part Two | "Alexa, imprime pieza dos" |
-| Print Part Three | "Alexa, imprime pieza tres" |
-| Printer Emergency | "Alexa, emergencia de la impresora" / "Alexa, detén impresora inmediatamente" |
+| Impresora 3D | "Alexa, enciende impresora 3D" / "Alexa, apaga impresora 3D" |
+| Luz de la Impresora | "Alexa, enciende luz de la impresora" / "Alexa, apaga luz de la impresora" |
+| Pausar Impresión | "Alexa, pausa impresión" |
+| Reanudar Impresión | "Alexa, reanuda impresión" |
+| Cancelar Impresión | "Alexa, cancela impresión" |
+| Llevar Impresora a Inicio | "Alexa, lleva impresora a inicio" |
+| Nivelar Cama | "Alexa, nivela cama" |
+| Subir Eje Z | "Alexa, sube eje Z" |
+| Bajar Eje Z | "Alexa, baja eje Z" |
+| Extruir Filamento | "Alexa, extruye filamento" |
+| Retraer Filamento | "Alexa, retrae filamento" |
+| Calentar Cama | "Alexa, calienta cama" / "Alexa, enciende calentamiento de cama" |
+| Apagar Cama | "Alexa, apaga cama" / "Alexa, apaga calentamiento de cama" |
+| Calentar Boquilla para PLA | "Alexa, calienta boquilla para PLA" |
+| Calentar Boquilla para ABS | "Alexa, calienta boquilla para ABS" |
+| Calentar Boquilla para PETG | "Alexa, calienta boquilla para PETG" |
+| Apagar Calentamiento de la Boquilla | "Alexa, apaga calentamiento de la boquilla" / "Alexa, apaga boquilla" |
+| Motores de la Impresora | "Alexa, enciende motores de la impresora" / "Alexa, apaga motores de la impresora" |
+| Imprimir Último Archivo | "Alexa, imprime último archivo" |
+| Imprimir Pieza Uno | "Alexa, imprime pieza uno" |
+| Imprimir Pieza Dos | "Alexa, imprime pieza dos" |
+| Imprimir Pieza Tres | "Alexa, imprime pieza tres" |
+| Emergencia de la Impresora | "Alexa, emergencia de la impresora" / "Alexa, detén impresora inmediatamente" |
 
 Alexa language behavior can vary by Echo model and account locale. A custom
 device name can be used when a default phrase is not recognized reliably.
@@ -276,6 +279,10 @@ OctoPrint installs the matching GitHub tag archive:
 ```text
 https://github.com/RICLAMER/AlexaOctoPrint/archive/{target_version}.zip
 ```
+
+Every stable Release also includes an installable asset named exactly
+`OctoPrint-AlexaOctoPrint.zip`. The OctoPrint Plugin Repository uses the
+permanent `releases/latest/download` URL for that asset.
 
 This follows the release and update pattern used by
 [OctoPrint-BLTouch](https://github.com/jneilliii/OctoPrint-BLTouch).

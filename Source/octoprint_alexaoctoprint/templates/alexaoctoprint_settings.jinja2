@@ -91,12 +91,12 @@
           <td>
             <label class="checkbox">
               <input type="checkbox" data-bind="checked: $root.actionSetting($data, 'enabled')">
-              <span data-bind="text: name"></span>
+              <span data-bind="text: $root.actionDisplayName($data)"></span>
             </label>
             <code data-bind="text: key"></code>
           </td>
           <td>
-            <input type="text" class="input-large" data-bind="value: $root.actionSetting($data, 'name')" placeholder="Alexa device name">
+            <input type="text" class="input-large" data-bind="textInput: $root.actionSetting($data, 'name')" placeholder="Alexa device name">
             <label class="checkbox">
               <input type="checkbox" data-bind="checked: $root.actionSetting($data, 'allow_while_printing')">
               {{ _('Allow while printing') }}
